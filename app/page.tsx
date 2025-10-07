@@ -12,6 +12,7 @@ export default function Home() {
   const [imagePreview, setImagePreview] = useState<string>("");
   const [isUploading, setIsUploading] = useState(false);
   const [uploadedImageUrl, setUploadedImageUrl] = useState<string>("");
+  const [isUsingDemo, setIsUsingDemo] = useState(false);
 
   const onDrop = useCallback(async (acceptedFiles: File[]) => {
     const file = acceptedFiles[0];
@@ -146,9 +147,39 @@ export default function Home() {
           /* Main Interface */
           <div className="space-y-8">
             {/* Image Preview */}
+
             <Card>
               <CardHeader>
                 <CardTitle className="font-heading">Your Image</CardTitle>
+
+                {isUploading && (
+                  <div className="bg-blue-50 dark:bg-blue-950/20 border border-blue-200 dark:border-blue-800 rounded-lg p-3">
+                    <p className="text-sm text-blue-800 dark:text-blue-200">
+                      📤 Uploading to PicForge...
+                    </p>
+                  </div>
+                )}
+                {!isUsingDemo &&
+                  uploadedImage &&
+                  !isUploading &&
+                  uploadedImageUrl && (
+                    <div className="bg-green-50 dark:bg-green-950/20 border border-green-200 dark:border-green-800 rounded-lg p-3">
+                      <p className="text-sm text-green-800 dark:text-green-200">
+                        ✅ Image uploaded! AI transformations will work on your
+                        actual image.
+                      </p>
+                    </div>
+                  )}
+                {!isUsingDemo &&
+                  uploadedImage &&
+                  !isUploading &&
+                  !uploadedImageUrl && (
+                    <div className="bg-red-50 dark:bg-red-950/20 border border-red-200 dark:border-red-800 rounded-lg p-3">
+                      <p className="text-sm text-red-800 dark:text-red-200">
+                        ❌ Upload failed. Transformations will use demo image.
+                      </p>
+                    </div>
+                  )}
               </CardHeader>
               <CardContent>
                 <div className="bg-muted/50 rounded-lg p-4 aspect-square flex items-center justify-center">
