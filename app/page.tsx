@@ -264,23 +264,42 @@ export default function Home() {
               </CardContent>
             </Card>
 
-            {/* Transformation Tools Placeholder */}
+            {/* Transformations */}
             <Card>
               <CardHeader>
                 <CardTitle className="font-heading">AI Tools</CardTitle>
               </CardHeader>
-              <CardContent>
-                <div className="text-center py-8">
-                  <div className="w-16 h-16 mx-auto rounded-full bg-primary/10 flex items-center justify-center mb-4">
-                    <Sparkles className="w-8 h-8 text-primary" />
-                  </div>
-                  <h3 className="text-lg font-heading font-semibold mb-2">
-                    AI Transformations Coming Soon
-                  </h3>
-                  <p className="text-muted-foreground font-sans">
-                    Follow the tutorial to add ImageKit AI transformations
-                  </p>
-                </div>
+              <CardContent className="space-y-3">
+                {mainTransformations.map((option) => {
+                  const Icon =
+                    iconMap[option.icon as keyof typeof iconMap] || Sparkles;
+                  const isSelected = selectedTransformations.includes(
+                    option.id
+                  );
+                  return (
+                    <div
+                      key={option.id}
+                      className={`p-3 rounded-lg border cursor-pointer transition-all ${
+                        isSelected
+                          ? "border-primary bg-primary/5"
+                          : "border-border hover:border-primary/50"
+                      }`}
+                      onClick={() => toggleTransformation(option.id)}
+                    >
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center space-x-3">
+                          <Icon className="w-5 h-5 text-primary" />
+                          <span className="font-heading font-medium">
+                            {option.name}
+                          </span>
+                        </div>
+                        {isSelected && (
+                          <Check className="w-4 h-4 text-primary" />
+                        )}
+                      </div>
+                    </div>
+                  );
+                })}
               </CardContent>
             </Card>
 
