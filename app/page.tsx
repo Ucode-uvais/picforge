@@ -1,18 +1,62 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { useDropzone } from "react-dropzone";
-import { Upload, Download, RotateCcw, Sparkles } from "lucide-react";
+import {
+  Upload,
+  Download,
+  RotateCcw,
+  Check,
+  Loader2,
+  Sparkles,
+  Eraser,
+  Wand2,
+  ZoomIn,
+  Crop,
+  User,
+  Edit,
+  Copy,
+} from "lucide-react";
 import { upload } from "@imagekit/next";
+
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Progress } from "@/components/ui/progress";
+
+import {
+  transformationOptions,
+  demoImages,
+  buildTransformationUrl,
+} from "@/config/imagekit";
+
+// Icon mapping for transformations
+const iconMap = {
+  eraser: Eraser,
+  scissors: Eraser,
+  shadow: Wand2,
+  sparkles: Sparkles,
+  "zoom-in": ZoomIn,
+  crop: Crop,
+  user: User,
+  copy: Copy,
+  palette: Wand2,
+  edit: Edit,
+};
 
 export default function Home() {
   const [uploadedImage, setUploadedImage] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string>("");
-  const [isUploading, setIsUploading] = useState(false);
-  const [uploadedImageUrl, setUploadedImageUrl] = useState<string>("");
+  const [selectedTransformations, setSelectedTransformations] = useState<
+    string[]
+  >([]);
+
+  const [processedImageUrl, setProcessedImageUrl] = useState<string>("");
+
   const [isUsingDemo, setIsUsingDemo] = useState(false);
+  const [uploadedImageUrl, setUploadedImageUrl] = useState<string>("");
+  const [isUploading, setIsUploading] = useState(false);
+  const [isImageLoading, setIsImageLoading] = useState(false);
 
   const onDrop = useCallback(async (acceptedFiles: File[]) => {
     const file = acceptedFiles[0];
@@ -74,6 +118,22 @@ export default function Home() {
     maxSize: 10 * 1024 * 1024, // 10MB
   });
 
+  const toggleTransformation = (transformationId: string) => {
+    setSelectedTransformations((prev) => {
+      if (prev.includes(transformationId)) {
+        return prev.filter((id) => id !== transformationId);
+      } else {
+        return [...prev, transformationId];
+      }
+    });
+
+    // Reset processed image and loading state when changing selections
+    if (processedImageUrl) {
+      setProcessedImageUrl("");
+      setIsImageLoading(false);
+    }
+  };
+
   const reset = () => {
     setUploadedImage(null);
     setImagePreview("");
@@ -83,6 +143,18 @@ export default function Home() {
     // For tutorial: Add demo image logic
     console.log("Demo image selected");
   };
+
+  // Get main transformations
+  const mainTransformations = transformationOptions.filter((t) =>
+    [
+      "bg-removal",
+      "bg-remove-shadow",
+      "smart-crop",
+      "face-crop",
+      "resize-optimize",
+      "enhance-basic",
+    ].includes(t.id)
+  );
 
   return (
     <div className="min-h-screen bg-background">
