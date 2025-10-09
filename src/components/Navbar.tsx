@@ -1,19 +1,36 @@
 "use client";
-import { useSession } from "next-auth/react";
-import React, { useState } from "react";
+import { signIn, useSession } from "next-auth/react";
+import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { SwitchCamera } from "lucide-react";
+import { Menu, SwitchCamera, X } from "lucide-react";
+import { Button } from "./ui/button";
 
 const Navbar = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const { data: session } = useSession();
 
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 20);
+    };
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
   const scrollToSection = (sectionId: string) => {
     const element = document.getElementById(sectionId);
     if (element) {
       element.scrollIntoView({ behavior: "smooth" });
       setIsMobileMenuOpen(false);
+    }
+  };
+
+  const handleSubmit = async () => {
+    if (session?.user) {
+      scrollToSection("editor");
+    } else {
+      await signIn("google");
     }
   };
 
@@ -39,7 +56,7 @@ const Navbar = () => {
             <div className="relative">
               <SwitchCamera
                 fill="transparent"
-                className="h-w w-8 text-primary animate-glow-pulse"
+                className="h-8 w-8 text-primary animate-glow-pulse"
               />
               <div className="absolute inset-0 h-8 w-8 text-secondary animate-glow-pulse opacity-50" />
             </div>
@@ -47,7 +64,73 @@ const Navbar = () => {
               Picforge AI
             </span>
           </motion.div>
+
+          {/*Navigation*/}
+          <div className="hidden md:flex items-center space-x-8">
+            <button
+              onClick={() => scrollToSection("features")}
+              className="text-foreground hover:text-primary transition-colors font-medium"
+            >
+              Features
+            </button>
+            <button
+              onClick={() => scrollToSection("pricing")}
+              className="text-foreground hover:text-primary transition-colors font-medium"
+            >
+              Pricing
+            </button>
+            <Button
+              variant="hero"
+              className="w-full font-semibold"
+              onClick={handleSubmit}
+            >
+              {session?.user ? "Let's Forge" : "Sign In"}
+            </Button>
+          </div>
+
+          {/* Mobile Menu */}
+          <button
+            className="md:hidden text-foreground"
+            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+          >
+            {isMobileMenuOpen ? (
+              <X className="h-6 w-6" />
+            ) : (
+              <Menu className="h-6 w-6" />
+            )}
+          </button>
         </div>
+
+        <motion.div
+          initial={false}
+          animate={{
+            height: isMobileMenuOpen ? "auto" : 0,
+            opacity: isMobileMenuOpen ? 1 : 0,
+          }}
+          className="md:hidden overflow-hidden"
+        >
+          <div className="py-4 space-y-4">
+            <button
+              onClick={() => scrollToSection("features")}
+              className="block w-full text-left text-foreground hover:text-primary transition-colors font-medium"
+            >
+              Features
+            </button>
+            <button
+              onClick={() => scrollToSection("pricing")}
+              className="block w-full text-left text-foreground hover:text-primary transition-colors font-medium"
+            >
+              Pricing
+            </button>
+            <Button
+              variant="hero"
+              className="w-full font-semibold"
+              onClick={handleSubmit}
+            >
+              {session?.user ? "Let's Forge" : "Sign In"}
+            </Button>
+          </div>
+        </motion.div>
       </div>
     </motion.nav>
   );

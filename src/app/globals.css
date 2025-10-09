@@ -23,13 +23,13 @@
   --color-popover: hsl(220 27% 8%);
   --color-popover-foreground: hsl(210 40% 98%);
 
-  --color-primary: hsl(192 100% 50%);
+  --color-primary: hsl(45 100% 50%); /* Changed */
   --color-primary-foreground: hsl(220 27% 6%);
 
-  --color-primary-glow: hsl(192 100% 70%);
-  --color-secondary-glow: hsl(271 81% 70%);
+  --color-primary-glow: hsl(45 100% 70%); /* Adjusted for new primary */
+  --color-secondary-glow: hsl(24 97% 70%); /* Adjusted for new secondary */
 
-  --color-secondary: hsl(271 81% 56%);
+  --color-secondary: hsl(24 97% 58%); /* Changed */
   --color-secondary-foreground: hsl(210 40% 98%);
 
   --color-destructive: hsl(0 84.2% 60.2%);
@@ -38,18 +38,18 @@
   --color-muted: hsl(220 27% 12%);
   --color-muted-foreground: hsl(215 20.2% 65.1%);
 
-  --color-accent: hsl(271 81% 56%);
+  --color-accent: hsl(24 97% 58%); /* Changed */
   --color-accent-foreground: hsl(210 40% 98%);
 
   --color-border: hsl(220 27% 15%);
   --color-input: hsl(220 27% 10%);
-  --color-ring: hsl(192 100% 50%);
+  --color-ring: hsl(45 100% 50%); /* Changed */
 
   /* You can reference these in utilities via var() */
   --gradient-primary: linear-gradient(
     135deg,
-    hsl(192 100% 50%),
-    hsl(271 81% 56%)
+    hsl(45 100% 50%),
+    /* Changed */ hsl(24 97% 58%) /* Changed */
   );
   --gradient-glass: linear-gradient(
     135deg,
@@ -58,13 +58,13 @@
   );
   --gradient-border: linear-gradient(
     135deg,
-    hsl(192 100% 50% / 0.3),
-    hsl(271 81% 56% / 0.3)
+    hsl(45 100% 50% / 0.3),
+    /* Changed */ hsl(24 97% 58% / 0.3) /* Changed */
   );
 
-  --glow-primary: 0 0 40px hsl(192 100% 50% / 0.3);
-  --glow-secondary: 0 0 40px hsl(271 81% 56% / 0.3);
-  --glow-subtle: 0 4px 20px hsl(192 100% 50% / 0.1);
+  --glow-primary: 0 0 40px hsl(45 100% 50% / 0.3); /* Changed */
+  --glow-secondary: 0 0 40px hsl(24 97% 58% / 0.3); /* Changed */
+  --glow-subtle: 0 4px 20px hsl(45 100% 50% / 0.1); /* Changed */
 }
 
 /* ===== BASE ===== */
@@ -106,7 +106,7 @@
     border-radius: 4px;
   }
   ::-webkit-scrollbar-thumb:hover {
-    background: hsl(192 100% 70%);
+    background: hsl(45 100% 70%); /* Adjusted for new primary */
   }
 }
 
