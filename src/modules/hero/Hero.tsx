@@ -3,6 +3,7 @@ import React from "react";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Play, Sparkles, Axe } from "lucide-react";
+import BeforeAfterSlider from "./BeforeAfterSlider";
 
 const Hero = () => {
   const scrollToSection = (sectionId: string) => {
@@ -110,6 +111,16 @@ const Hero = () => {
               <span>Unlimited edits</span>
             </div>
           </motion.div>
+        </motion.div>
+
+        {/* Right Content - Before/After Slider */}
+        <motion.div
+          initial={{ opacity: 0, x: 50 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.8, delay: 0.2 }}
+          className="flex justify-center"
+        >
+          <BeforeAfterSlider />
         </motion.div>
       </div>
     </section>
