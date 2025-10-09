@@ -45,7 +45,7 @@ const BeforeAfterSlider = () => {
         <div className="absolute inset-0">
           <img
             src={beforeImage}
-            alt="Before - View of Tree in the Evening"
+            alt="Before - Original Image of Tree"
             className="w-full h-full object-cover select-none"
           />
         </div>
@@ -57,7 +57,7 @@ const BeforeAfterSlider = () => {
         >
           <img
             src={afterImage}
-            alt="After - View of Tree at Night"
+            alt="After - AI Edited Image of Tree"
             className="w-full h-full object-cover select-none"
           />
         </div>
