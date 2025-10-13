@@ -32,7 +32,7 @@ const CanvasEditor = ({
             <span className="text-2xl">🎨</span>
           </div>
           <h3 className="text-lg font-semibold text-foreground mb-2">
-            Ready for Magic
+            Ready to Forge
           </h3>
           <p className="text-muted-foreground">
             Upload a photo to start editing
@@ -155,7 +155,7 @@ const CanvasEditor = ({
           <p className="text-sm text-primary">Processing with AI...</p>
         ) : processedImage ? (
           <p className="text-sm text-primary">
-            🔨Forging is done! Compare or export your result
+            🔨 Forging is done! Compare or export your result
           </p>
         ) : (
           <p className="text-sm text-muted-foreground">
