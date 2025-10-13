@@ -15,6 +15,7 @@ import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import UploadZone from "./UploadZone";
 import CanvasEditor from "./CanvasEditor";
+import { saveAs } from "file-saver";
 
 type JobStatus = "idle" | "queued" | "processing" | "completed" | "error";
 
@@ -136,6 +137,12 @@ const Editor = () => {
     if (!uploadedImage) return;
 
     const tool = allTools.find((t) => t.id === toolId);
+  };
+
+  const handleExport = (format: string) => {
+    if (!processedImage) return;
+
+    saveAs(processedImage, `pixora-${Date.now()}.${format}`);
   };
 
   return (
@@ -327,6 +334,114 @@ const Editor = () => {
                 })}
               </div>
             </motion.div>
+          </motion.div>
+
+          {/* Right Panel - Job Status */}
+          <motion.div
+            initial={{ opacity: 0, x: 50 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true }}
+            className="lg:col-span-1"
+          >
+            <div className="shadow-glass rounded-xl p-6 border border-gray-800">
+              <h3 className="text-lg font-semibold text-foreground mb-4">
+                Job Status
+              </h3>
+
+              {currentJob ? (
+                <div className="space-y-4">
+                  <div className="flex items-center space-x-3">
+                    {currentJob.status === "processing" ? (
+                      <Loader2 className="h-5 w-5 text-primary animate-spin" />
+                    ) : currentJob.status === "completed" ? (
+                      <CheckCircle className="h-5 w-5 text-primary" />
+                    ) : currentJob.status === "queued" ? (
+                      <Clock className="h-5 w-5 text-muted-foreground animate-pulse" />
+                    ) : (
+                      <Clock className="h-5 w-5 text-muted-foreground" />
+                    )}
+                    <div>
+                      <p className="font-medium text-foreground capitalize">
+                        {allTools.find((t) => t.id === currentJob.type)?.name ||
+                          currentJob.type.replace("-", " ")}
+                      </p>
+                      <p className="text-sm text-muted-foreground capitalize">
+                        {currentJob.status === "queued" &&
+                          "Preparing AI transformation..."}
+                        {currentJob.status === "processing" &&
+                          `Processing with AI... (${currentJob.progress}%)`}
+                        {currentJob.status === "completed" &&
+                          "AI transformation completed!"}
+                        {currentJob.status === "error" && "Processing failed"}
+                      </p>
+                    </div>
+                  </div>
+
+                  {(currentJob.status === "processing" ||
+                    currentJob.status === "queued") && (
+                    <div className="w-full bg-muted rounded-full h-2">
+                      <div
+                        className={`h-2 rounded-full transition-all duration-300 ${
+                          currentJob.status === "queued"
+                            ? "bg-muted-foreground animate-pulse"
+                            : "bg-gradient-primary"
+                        }`}
+                        style={{
+                          width:
+                            currentJob.status === "queued"
+                              ? "100%"
+                              : `${currentJob.progress}%`,
+                        }}
+                      />
+                      <div className="text-xs text-muted-foreground mt-1 text-center">
+                        {currentJob.status === "queued" && "Initializing..."}
+                        {currentJob.status === "processing" &&
+                          "Waiting for AI to complete transformation..."}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <p className="text-muted-foreground text-sm">
+                  Upload an image and select a tool to start
+                </p>
+              )}
+              {/* Edit History */}
+              {editHistory?.length > 0 && (
+                <div className="mt-8">
+                  <h4 className="text-sm font-semibold text-foreground mb-3">
+                    Recent Edits
+                  </h4>
+                  <div className="space-y-2">
+                    {editHistory?.map((job) => (
+                      <div
+                        key={job.id}
+                        className="flex items-center space-x-2 text-sm"
+                      >
+                        <CheckCircle className="h-3 w-3 text-primary flex-shrink-0" />
+                        <span className="text-muted-foreground capitalize">
+                          {job?.type?.replace("-", " ")}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Download Button */}
+              {processedImage && (
+                <div className="mt-6">
+                  <Button
+                    variant={"hero"}
+                    onClick={() => handleExport("jpg")}
+                    className="w-full"
+                  >
+                    <Download className="h-4 w-4 mr-2" />
+                    Download
+                  </Button>
+                </div>
+              )}
+            </div>
           </motion.div>
         </div>
       </div>
