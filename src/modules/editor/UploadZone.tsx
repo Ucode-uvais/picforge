@@ -96,7 +96,86 @@ const UploadZone = ({ onImageUpload }: UploadZoneProps) => {
     return data;
   };
 
-  return <div></div>;
+  return (
+    <motion.div
+      initial={{ opacity: 0, scale: 0.95 }}
+      animate={{ opacity: 1, scale: 1 }}
+      className="relative"
+    >
+      {uploadedImage ? (
+        <div></div>
+      ) : (
+        <div
+          onDragOver={handleDragOver}
+          onDragLeave={handleDragLeave}
+          onDrop={handleDrop}
+          className={`shadow-glass rounded-xl p-8 border-2 border-dashed border-gray-800 transition-all duration-300 cursor-pointer ${
+            isDragOver
+              ? "border-primary bg-primary/5 scale-105"
+              : "border-card-border  hover:border-primary/50 hover:bg-primary/5"
+          }`}
+        >
+          <input
+            type="file"
+            accept="image/*"
+            onChange={handleFileSelect}
+            className="hidden"
+            id="file-upload"
+          />
+          <label
+            htmlFor="file-upload"
+            className="cursor-pointer block text-center"
+          >
+            <motion.div
+              animate={isDragOver ? { scale: 1.1 } : { scale: 1 }}
+              className="mb-4"
+            >
+              <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-primary/20 to-secondary/20 mb-4">
+                {isUploading ? (
+                  <Loader2 className="w-8 h-8 text-primary animate-spin" />
+                ) : isDragOver ? (
+                  <Upload className="w-8 h-8 text-primary animate-bounce" />
+                ) : (
+                  <ImageIcon className="w-8 h-8 text-primary" />
+                )}
+              </div>
+            </motion.div>
+
+            <h3 className="text-lg font-semibold text-foreground mb-2">
+              {isUploading
+                ? "Uploading to cloud..."
+                : isDragOver
+                ? "Drop your Image here"
+                : "Upload Image"}
+            </h3>
+            <p className="text-muted-foreground text-sm mb-4">
+              {isUploading
+                ? "Please wait while we upload your image"
+                : "Drag & drop or click to browse"}
+            </p>
+
+            <Button
+              variant="outline"
+              className="glass border-card-border"
+              disabled={isUploading}
+            >
+              {isUploading ? (
+                <>
+                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                  Uploading...
+                </>
+              ) : (
+                <>
+                  <Upload className="h-4 w-4 mr-2" />
+                  Browse Files
+                </>
+              )}
+            </Button>
+          </label>
+        </div>
+      )}
+    </motion.div>
+  );
 };
 
 export default UploadZone;
