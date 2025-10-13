@@ -1,7 +1,7 @@
 import { Plan } from "@prisma/client";
-import { CloudRain } from "lucide-react";
 import { NextAuthOptions } from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
+import prisma from "./prisma";
 
 const common = async ({
   email,
@@ -19,6 +19,26 @@ const common = async ({
   usageLimit: number;
 }) => {
   try {
+    const user = await prisma.users.findUnique({
+      where: {
+        email,
+      },
+    });
+    if (!user) {
+      const user = await prisma.users.create({
+        data: {
+          email,
+          name,
+          avatar,
+          plan,
+          usageCount,
+          usageLimit,
+        },
+      });
+      return user;
+    } else {
+      return user;
+    }
   } catch (error) {
     console.log(error);
   }
