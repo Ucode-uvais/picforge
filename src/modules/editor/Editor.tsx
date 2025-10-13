@@ -5,9 +5,15 @@ import {
   Crop,
   Download,
   Expand,
+  ImageUpscale,
   Loader2,
+  ScanFace,
   Scissors,
+  Split,
+  SquareScissors,
   Type,
+  Wallpaper,
+  WandSparkles,
   Zap,
 } from "lucide-react";
 import React, { useState } from "react";
@@ -38,14 +44,14 @@ const primaryTools = [
   {
     id: "e-removedotbg",
     name: "Remove Background (Pro)",
-    icon: Scissors,
+    icon: SquareScissors,
     color: "secondary",
     description: "High-quality background removal",
   },
   {
     id: "e-changebg",
     name: "Change Background",
-    icon: Expand,
+    icon: Wallpaper,
     color: "primary",
     description: "Replace background with AI",
     hasPrompt: true,
@@ -79,21 +85,21 @@ const secondaryTools = [
   {
     id: "e-retouch",
     name: "AI Retouch",
-    icon: Zap,
+    icon: WandSparkles,
     color: "primary",
     description: "Enhance and retouch image",
   },
   {
     id: "e-upscale",
     name: "AI Upscale 2x",
-    icon: Zap,
+    icon: ImageUpscale,
     color: "secondary",
     description: "Upscale image quality",
   },
   {
     id: "e-genvar",
     name: "Generate Variations",
-    icon: Type,
+    icon: Split,
     color: "primary",
     description: "Create image variations",
     hasPrompt: true,
@@ -101,7 +107,7 @@ const secondaryTools = [
   {
     id: "e-crop-face",
     name: "Face Crop",
-    icon: Crop,
+    icon: ScanFace,
     color: "secondary",
     description: "Smart face-focused cropping",
   },
@@ -142,7 +148,7 @@ const Editor = () => {
   const handleExport = (format: string) => {
     if (!processedImage) return;
 
-    saveAs(processedImage, `pixora-${Date.now()}.${format}`);
+    saveAs(processedImage, `picforge-${Date.now()}.${format}`);
   };
 
   return (
