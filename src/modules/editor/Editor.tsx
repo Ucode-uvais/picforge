@@ -274,6 +274,59 @@ const Editor = () => {
               processedImage={processedImage}
               isProcessing={currentJob?.status === "processing"}
             />
+
+            {/* Secondery Tools */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="mt-6"
+            >
+              <h4 className="text-sm font-semibold text-foreground mb-3">
+                Additional Tools
+              </h4>
+              <div className="grid grid-cols-2 gap-2">
+                {secondaryTools.map((tool) => {
+                  const isActive = activeEffects.has(tool.id);
+                  const isProcessing =
+                    currentJob?.type === tool.id &&
+                    currentJob.status === "processing";
+                  const isQueued =
+                    currentJob?.type === tool.id &&
+                    currentJob.status === "queued";
+                  const isDisabled =
+                    !uploadedImage || currentJob?.status === "processing";
+
+                  return (
+                    <Button
+                      key={tool.id}
+                      variant={isActive ? "default" : "outline"}
+                      size="sm"
+                      className={`justify-start shadow-glass transition-all ${
+                        isActive
+                          ? "bg-primary text-primary-foreground border-primary"
+                          : "border-gray-600 hover:border-primary/30"
+                      }`}
+                      onClick={() => handleToolClick(tool.id)}
+                      disabled={isDisabled}
+                      title={tool.description}
+                    >
+                      <tool.icon
+                        className={`h-3 w-3 mr-2 ${
+                          isProcessing ? "animate-pulse" : ""
+                        }`}
+                      />
+                      <span className="text-xs">{tool.name}</span>
+                      {isActive && !isProcessing && (
+                        <div className="w-1.5 h-1.5 bg-primary-foreground rounded-full ml-auto" />
+                      )}
+                      {isProcessing && (
+                        <Loader2 className="h-3 w-3 ml-auto animate-spin" />
+                      )}
+                    </Button>
+                  );
+                })}
+              </div>
+            </motion.div>
           </motion.div>
         </div>
       </div>
