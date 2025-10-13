@@ -13,6 +13,7 @@ import {
 import React, { useState } from "react";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
+import UploadZone from "./UploadZone";
 
 type JobStatus = "idle" | "queued" | "processing" | "completed" | "error";
 
@@ -114,7 +115,58 @@ const secondaryTools = [
 const allTools = [...primaryTools, ...secondaryTools];
 
 const Editor = () => {
-  return <div></div>;
+  const [uploadedImage, setUploadedImage] = useState<string | null>(null);
+  const [processedImage, setProcessedImage] = useState<string | null>(null);
+  const [currentJob, setCurrentJob] = useState<ProcessingJob | null>(null);
+  const [editHistory, setEditHistory] = useState<ProcessingJob[]>([]);
+  const [activeEffects, setActiveEffects] = useState<Set<string>>(new Set());
+  const [promptText, setPromptText] = useState<string>("");
+  const [showPromptInput, setShowPromptInput] = useState<boolean>(false);
+
+  const handleImageUpload = (imageUrl: string) => {
+    setUploadedImage(imageUrl);
+    setProcessedImage(null);
+    setCurrentJob(null);
+  };
+
+  return (
+    <section id="editor" className="py-24 relative overflow-hidden">
+      {/*BG Effects*/}
+      <div className="absolute inset-0 bg-gradient-to-b from-background to-muted/10" />
+      <div className="container mx-auto px-4 relative z-10">
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.8 }}
+          className="text-center mb-12"
+        >
+          <h2 className="text-4xl lg:text-6xl font-bold mb-6">
+            <span className="bg-gradient-primary !bg-clip-text text-transparent">
+              Forging
+            </span>
+            <span className="text-foreground"> Studio</span>
+          </h2>
+          <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
+            Upload your photo and transform it with AI-powered tools. See the
+            image forgery happen in real-time.
+          </p>
+        </motion.div>
+
+        <div className="grid lg:grid-cols-4 gap-8">
+          {/*Upload Area*/}
+          <motion.div
+            initial={{ opacity: 0, x: -50 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true }}
+            className="lg:col-span-1"
+          >
+            <UploadZone onImageUpload={handleImageUpload} />
+          </motion.div>
+        </div>
+      </div>
+    </section>
+  );
 };
 
 export default Editor;
