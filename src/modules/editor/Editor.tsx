@@ -14,6 +14,7 @@ import React, { useState } from "react";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import UploadZone from "./UploadZone";
+import CanvasEditor from "./CanvasEditor";
 
 type JobStatus = "idle" | "queued" | "processing" | "completed" | "error";
 
@@ -129,6 +130,14 @@ const Editor = () => {
     setCurrentJob(null);
   };
 
+  const handlePromptSubmit = async () => {};
+
+  const handleToolClick = async (toolId: string) => {
+    if (!uploadedImage) return;
+
+    const tool = allTools.find((t) => t.id === toolId);
+  };
+
   return (
     <section id="editor" className="py-24 relative overflow-hidden">
       {/*BG Effects*/}
@@ -162,6 +171,109 @@ const Editor = () => {
             className="lg:col-span-1"
           >
             <UploadZone onImageUpload={handleImageUpload} />
+
+            {/* Toolbar */}
+            <div className="mt-6 space-y-3">
+              <h3 className="text-lg font-semibold text-foreground mb-4">
+                AI Tools
+              </h3>
+
+              {/* Prompt Input*/}
+              {showPromptInput && (
+                <motion.div
+                  initial={{ opacity: 0, y: -10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="space-y-3 p-4 glass rounded-lg border border-card-border"
+                >
+                  <textarea
+                    value={promptText}
+                    onChange={(e) => setPromptText(e.target.value)}
+                    placeholder="Describe what you want to change..."
+                    className="w-full p-3 bg-background border border-border rounded-md text-foreground placeholder:text-muted-foreground resize-none"
+                    rows={3}
+                  />
+
+                  <div className="flex gap-2">
+                    <Button
+                      onClick={handlePromptSubmit}
+                      disabled={!promptText.trim()}
+                      className="flex-1"
+                    >
+                      Apply
+                    </Button>
+                    <Button
+                      variant="outline"
+                      onClick={() => setShowPromptInput(false)}
+                    >
+                      Cancel
+                    </Button>
+                  </div>
+                </motion.div>
+              )}
+              {primaryTools.map((tool) => {
+                const isActive = activeEffects.has(tool.id);
+                const isProcessing =
+                  currentJob?.type === tool.id &&
+                  currentJob.status === "processing";
+                const isQueued =
+                  currentJob?.type === tool.id &&
+                  currentJob.status === "processing";
+                const isDisabled =
+                  !uploadedImage || currentJob?.status === "processing";
+
+                return (
+                  <Button
+                    key={tool.id}
+                    variant={isActive ? "default" : "outline"}
+                    className={`w-full justify-start shadow-glass transition-all ${
+                      isActive
+                        ? "bg-primary text-primary-foreground border-primary"
+                        : "border-gray-600 hover:border-primary/30"
+                    }`}
+                    onClick={() => handleToolClick(tool.id)}
+                    disabled={isDisabled}
+                    title={tool.description}
+                  >
+                    <tool.icon
+                      className={`h-4 w-4 mr-2 ${
+                        isProcessing ? "animate-pulse" : ""
+                      }`}
+                    />
+                    <div className="flex-1 text-left">
+                      <div className="font-medium">{tool.name}</div>
+                      {tool?.hasPrompt && (
+                        <div className="text-xs opacity-70">
+                          Requires Prompt
+                        </div>
+                      )}
+                    </div>
+                    {isActive && !isProcessing && (
+                      <div className="w-2 h-2 bg-primary-foreground rounded-full" />
+                    )}
+                    {isQueued && (
+                      <div className="w-2 h-2 bg-muted-foreground rounded-full animate-pulse" />
+                    )}
+                    {isProcessing && (
+                      <Loader2 className="h-4 w-4 ml-auto animate-spin" />
+                    )}
+                  </Button>
+                );
+              })}
+            </div>
+          </motion.div>
+
+          {/* Main Canvas */}
+          <motion.div
+            initial={{ opacity: 0, y: 50 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="lg:col-span-2"
+          >
+            <CanvasEditor
+              originalImage={uploadedImage}
+              processedImage={processedImage}
+              isProcessing={currentJob?.status === "processing"}
+            />
           </motion.div>
         </div>
       </div>
