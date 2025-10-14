@@ -232,7 +232,7 @@ const Editor = () => {
     const transforms = allEffects.map((effect) =>
       getImageKitTransform(effect, effect === toolId ? prompt : undefined)
     );
-    const newImageUrl = `${uploadedImage}?tr=${transforms.join(",")}`;
+    const newImageUrl = `${uploadedImage}?tr=${transforms.join(":")}`;
 
     try {
       // Start polling the AI transformation URL to check when it's complete
