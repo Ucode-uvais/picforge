@@ -55,7 +55,7 @@ const CanvasEditor = ({
             <div className="text-center">
               <Loader2 className="w-8 h-8 mx-auto mb-3 text-primary animate-spin" />
               <p className="text-foreground font-medium">
-                AI is forging right now...
+                AI is forging your image right now...
               </p>
               <p className="text-sm text-muted-foreground mt-1">
                 This usually takes a few seconds
