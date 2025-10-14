@@ -2,7 +2,12 @@ import React, { useCallback, useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { Crown, ImageIcon, Loader2, Upload, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { div } from "framer-motion/client";
+import {
+  ImageKitInvalidRequestError,
+  ImageKitServerError,
+  ImageKitUploadNetworkError,
+  upload,
+} from "@imagekit/next";
 
 interface UploadZoneProps {
   onImageUpload: (imageUrl: string) => void;
