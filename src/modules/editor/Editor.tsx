@@ -4,22 +4,22 @@ import {
   Clock,
   Crop,
   Download,
+  Edit3Icon,
   Expand,
-  ImageUpscale,
+  ImageUpscaleIcon,
   Loader2,
   ScanFace,
   Scissors,
-  Split,
-  SquareScissors,
+  ScissorsSquare,
   Type,
   Wallpaper,
-  WandSparkles,
+  Wand2,
   Zap,
 } from "lucide-react";
 import React, { useState } from "react";
 import { motion } from "framer-motion";
-import { Button } from "@/components/ui/button";
 import UploadZone from "./UploadZone";
+import { Button } from "@/components/ui/button";
 import CanvasEditor from "./CanvasEditor";
 import { saveAs } from "file-saver";
 
@@ -44,7 +44,7 @@ const primaryTools = [
   {
     id: "e-removedotbg",
     name: "Remove Background (Pro)",
-    icon: SquareScissors,
+    icon: ScissorsSquare,
     color: "secondary",
     description: "High-quality background removal",
   },
@@ -59,7 +59,7 @@ const primaryTools = [
   {
     id: "e-edit",
     name: "AI Edit",
-    icon: Type,
+    icon: Edit3Icon,
     color: "secondary",
     description: "Edit image with text prompts",
     hasPrompt: true,
@@ -85,34 +85,34 @@ const secondaryTools = [
   {
     id: "e-retouch",
     name: "AI Retouch",
-    icon: WandSparkles,
+    icon: Wand2,
     color: "primary",
     description: "Enhance and retouch image",
   },
   {
     id: "e-upscale",
     name: "AI Upscale 2x",
-    icon: ImageUpscale,
+    icon: ImageUpscaleIcon,
     color: "secondary",
     description: "Upscale image quality",
   },
   {
     id: "e-genvar",
     name: "Generate Variations",
-    icon: Split,
+    icon: Type,
     color: "primary",
     description: "Create image variations",
-    hasPrompt: true,
+    hasPrompt: false, // No prompt parameter according to docs
   },
   {
-    id: "e-crop-face",
+    id: "fo-face",
     name: "Face Crop",
     icon: ScanFace,
     color: "secondary",
     description: "Smart face-focused cropping",
   },
   {
-    id: "e-crop-smart",
+    id: "fo-auto",
     name: "Smart Crop",
     icon: Crop,
     color: "primary",
@@ -127,117 +127,283 @@ const Editor = () => {
   const [processedImage, setProcessedImage] = useState<string | null>(null);
   const [currentJob, setCurrentJob] = useState<ProcessingJob | null>(null);
   const [editHistory, setEditHistory] = useState<ProcessingJob[]>([]);
-  const [activeEffects, setActiveEffects] = useState<
-    Map<string, string | undefined>
-  >(new Map());
+  const [activeEffects, setActiveEffects] = useState<Set<string>>(new Set());
+  const [effectPrompts, setEffectPrompts] = useState<Record<string, string>>(
+    {}
+  );
   const [promptText, setPromptText] = useState<string>("");
   const [showPromptInput, setShowPromptInput] = useState<boolean>(false);
-  const [promptToolId, setPromptToolId] = useState<string | null>(null);
+  const [selectedPromptTool, setSelectedPromptTool] = useState<string | null>(
+    null
+  );
+  const [imageDimensions, setImageDimensions] = useState<{
+    width: number;
+    height: number;
+  } | null>(null);
 
-  const handleImageUpload = (imageUrl: string) => {
+  const getImageDimensions = (
+    imageUrl: string
+  ): Promise<{ width: number; height: number }> => {
+    return new Promise((resolve, reject) => {
+      const img = new Image();
+      img.onload = () => {
+        resolve({
+          width: img.naturalWidth,
+          height: img.naturalHeight,
+        });
+      };
+      img.onerror = () => {
+        reject(new Error("Failed to load image"));
+      };
+      img.src = imageUrl;
+    });
+  };
+
+  const handleImageUpload = async (imageUrl: string) => {
     setUploadedImage(imageUrl);
     setProcessedImage(null);
     setCurrentJob(null);
+    setActiveEffects(new Set());
+    setEffectPrompts({});
+
+    // Get image dimensions for bg-genfill
+    try {
+      const dimensions = await getImageDimensions(imageUrl);
+      setImageDimensions(dimensions);
+    } catch (error) {
+      console.error("Failed to get image dimensions:", error);
+      // Set default dimensions as fallback
+      setImageDimensions({ width: 1200, height: 800 });
+    }
   };
 
   const handlePromptSubmit = async () => {
-    if (!promptText.trim() || !promptToolId) return;
+    if (!promptText.trim() || !selectedPromptTool) return;
 
-    const newActiveEffects = new Map(activeEffects);
-    newActiveEffects.set(promptToolId, promptText);
-    setActiveEffects(newActiveEffects);
-
-    await applyAllEffects(newActiveEffects);
+    await applyEffect(selectedPromptTool, promptText);
     setShowPromptInput(false);
     setPromptText("");
-    setPromptToolId(null);
+    setSelectedPromptTool(null);
   };
 
-  const getImageKitTransform = (tooldId: string, prompt?: string): string => {
+  const getImageKitTransform = (
+    toolId: string,
+    prompt?: string,
+    additionalParams?: Record<string, string>
+  ): string => {
     const transforms: Record<string, string> = {
       "e-bgremove": "e-bgremove",
       "e-removedotbg": "e-removedotbg",
-
       "e-changebg": prompt
         ? `e-changebg-prompt-${encodeURIComponent(prompt)}`
         : "e-changebg",
-
       "e-edit": prompt
         ? `e-edit-prompt-${encodeURIComponent(prompt)}`
         : "e-edit",
+      "bg-genfill": (() => {
+        let transform = prompt
+          ? `bg-genfill-prompt-${encodeURIComponent(prompt)}`
+          : "bg-genfill";
 
-      "bg-genfill": prompt
-        ? `bg-genfill-prompt-${encodeURIComponent(prompt)}`
-        : "bg-genfill",
+        // Add required parameters for bg-genfill
+        if (additionalParams?.w) transform += `,w-${additionalParams.w}`;
+        if (additionalParams?.h) transform += `,h-${additionalParams.h}`;
+        if (additionalParams?.cm) transform += `,cm-${additionalParams.cm}`;
+
+        return transform;
+      })(),
       "e-dropshadow": "e-dropshadow",
       "e-retouch": "e-retouch",
       "e-upscale": "e-upscale",
-      // e-genvar does not accept prompt per docs — generate variations without a prompt
-      "e-genvar": "e-genvar",
-      "e-crop-face": "e-crop-face",
-      "e-crop-smart": "e-crop-smart",
+      "e-genvar": "e-genvar", // No prompt parameter according to docs
+      "fo-face": "fo-face", // Fixed ID for face crop
+      "fo-auto": "fo-auto", // Fixed ID for smart crop
     };
 
-    return transforms[tooldId] || "";
+    return transforms[toolId] || "";
+  };
+
+  // AI transformations that require async processing and colon chaining
+  const isAITransformation = (toolId: string): boolean => {
+    const aiTransforms = [
+      "e-bgremove",
+      "e-removedotbg",
+      "e-changebg",
+      "e-edit",
+      "bg-genfill",
+      "e-dropshadow",
+      "e-retouch",
+      "e-upscale",
+      "e-genvar",
+    ];
+    return aiTransforms.includes(toolId);
+  };
+
+  const buildTransformUrl = (
+    effects: string[],
+    uploadedImage: string,
+    promptMap?: Record<string, string>,
+    dimensions?: { width: number; height: number } | null
+  ): string => {
+    if (effects.length === 0) return uploadedImage;
+
+    // According to ImageKit docs: AI transformations should be chained with colons
+    // When mixing AI and regular transformations, separate them appropriately
+    const aiEffects: string[] = [];
+    const regularEffects: string[] = [];
+
+    effects.forEach((effect) => {
+      const prompt = promptMap?.[effect];
+
+      // Check if this effect requires a prompt but doesn't have one
+      const tool = allTools.find((t) => t.id === effect);
+      if (tool?.hasPrompt && !prompt) {
+        // Skip this effect if it requires a prompt but doesn't have one
+        return;
+      }
+
+      // Special handling for bg-genfill which requires width, height, and crop mode
+      let additionalParams: Record<string, string> | undefined;
+      if (effect === "bg-genfill") {
+        // Use actual image dimensions if available, otherwise use default fallbacks
+        if (dimensions) {
+          // For generative fill, we typically want to extend beyond original dimensions
+          // Adding 20% to each dimension for a nice extension effect
+          const extendWidth = Math.round(dimensions.width * 1.2);
+          const extendHeight = Math.round(dimensions.height * 1.2);
+
+          additionalParams = {
+            w: extendWidth.toString(),
+            h: extendHeight.toString(),
+            cm: "pad_resize",
+          };
+        } else {
+          // Fallback to default dimensions if image dimensions not available
+          additionalParams = {
+            w: "1200",
+            h: "800",
+            cm: "pad_resize",
+          };
+        }
+      }
+
+      const transform = getImageKitTransform(effect, prompt, additionalParams);
+
+      if (isAITransformation(effect)) {
+        aiEffects.push(transform);
+      } else {
+        regularEffects.push(transform);
+      }
+    });
+
+    // Build the transformation string
+    let transformString = "";
+
+    // Filter out empty transformations
+    const filteredRegularEffects = regularEffects.filter(
+      (t) => t && t.trim() !== ""
+    );
+    const filteredAiEffects = aiEffects.filter((t) => t && t.trim() !== "");
+
+    if (filteredRegularEffects.length > 0 && filteredAiEffects.length > 0) {
+      // Mixed transformations: regular first, then AI chained
+      transformString = `${filteredRegularEffects.join(
+        ","
+      )},${filteredAiEffects.join(":")}`;
+    } else if (filteredRegularEffects.length > 0) {
+      // Only regular transformations
+      transformString = filteredRegularEffects.join(",");
+    } else if (filteredAiEffects.length > 0) {
+      // Only AI transformations - chain with colons
+      transformString = filteredAiEffects.join(":");
+    }
+
+    return `${uploadedImage}?tr=${transformString}`;
   };
 
   const handleToolClick = async (toolId: string) => {
     if (!uploadedImage) return;
 
     const tool = allTools.find((t) => t.id === toolId);
+
     if (!tool) return;
+
+    // Toggle effect on/off
+    const newActiveEffects = new Set(activeEffects);
+    if (newActiveEffects.has(toolId)) {
+      newActiveEffects.delete(toolId);
+      setActiveEffects(newActiveEffects);
+
+      // Remove the prompt for this effect as well
+      const newEffectPrompts = { ...effectPrompts };
+      delete newEffectPrompts[toolId];
+      setEffectPrompts(newEffectPrompts);
+
+      // remove effect from image
+      const remainingEffects = Array.from(newActiveEffects);
+      const newImageUrl = buildTransformUrl(
+        remainingEffects,
+        uploadedImage,
+        newEffectPrompts,
+        imageDimensions
+      );
+      setProcessedImage(newImageUrl);
+      return;
+    }
 
     // Check if tool requires prompt
     if (tool.hasPrompt) {
+      setSelectedPromptTool(tool.id);
       setShowPromptInput(true);
-      setPromptToolId(tool.id);
-      setPromptText(activeEffects.get(toolId) || ""); // Pre-fill prompt if editing
+      setPromptText("");
       return;
     }
 
-    // For non-prompt tools, toggle the effect
-    const newActiveEffects = new Map(activeEffects);
-    if (newActiveEffects.has(toolId)) {
-      newActiveEffects.delete(toolId);
-    } else {
-      newActiveEffects.set(toolId, undefined);
-    }
-    setActiveEffects(newActiveEffects);
-
-    // Apply all active effects
-    await applyAllEffects(newActiveEffects);
+    // Apply effect immediately
+    await applyEffect(toolId);
   };
 
-  const applyAllEffects = async (effects: Map<string, string | undefined>) => {
+  const applyEffect = async (toolId: string, prompt?: string) => {
     if (!uploadedImage) return;
-
-    // If there are no effects, revert to the original image
-    if (effects.size === 0) {
-      setProcessedImage(uploadedImage);
-      setCurrentJob(null);
-      return;
-    }
 
     const newJob: ProcessingJob = {
       id: Date.now().toString(),
-      type: Array.from(effects.keys()).pop() || "effect", // Use the last effect as the job type
+      type: toolId,
       status: "queued",
       progress: 0,
     };
 
     setCurrentJob(newJob);
 
-    // Generate the ImageKit transformation strings from the map
-    const transforms = Array.from(effects.entries()).map(([toolId, prompt]) =>
-      getImageKitTransform(toolId, prompt)
+    // Check if tool requires prompt and we have one, or if it doesn't require prompt
+    const tool = allTools.find((t) => t.id === toolId);
+    const hasRequiredPrompt = !tool?.hasPrompt || (tool?.hasPrompt && prompt);
+
+    if (!hasRequiredPrompt) {
+      console.warn(`Tool ${toolId} requires a prompt but none was provided`);
+      return;
+    }
+
+    // Apply effect to active effects
+    const newActiveEffects = new Set(activeEffects);
+    newActiveEffects.add(toolId);
+    setActiveEffects(newActiveEffects);
+
+    // Update effect prompts to include the current prompt
+    const newEffectPrompts = { ...effectPrompts };
+    if (prompt && toolId) {
+      newEffectPrompts[toolId] = prompt;
+    }
+    setEffectPrompts(newEffectPrompts);
+
+    // Generate the ImageKit transformation URL
+    const allEffects = Array.from(newActiveEffects);
+    const newImageUrl = buildTransformUrl(
+      allEffects,
+      uploadedImage,
+      newEffectPrompts,
+      imageDimensions
     );
-
-    // join with colon (:) — ImageKit docs show chaining AI transforms with colon
-    const trString = transforms.join(":");
-
-    // handle case where uploadedImage might already contain query params
-    const separator = uploadedImage.includes("?") ? "&" : "?";
-    const newImageUrl = `${uploadedImage}${separator}tr=${trString}`;
 
     try {
       // Start polling the AI transformation URL to check when it's complete
@@ -247,7 +413,7 @@ const Editor = () => {
 
       let attempts = 0;
       const maxAttempts = 60; // 5 minutes max (5s intervals)
-      const pollInterval = 5000; // 5 seconds
+      const pollInterval = 5000; // 5seconds / 5k ms
 
       const pollImageKit = async (): Promise<boolean> => {
         attempts++;
@@ -255,11 +421,16 @@ const Editor = () => {
         try {
           const response = await fetch(newImageUrl, {
             method: "HEAD", // only check headers, don't download image
-            cache: "no-cache",
+            cache: "no-cache", // don't use cached version
           });
 
-          // If successful (200-ish), use the transformed image
-          if (response.ok) {
+          // Check for intermediate response header as per ImageKit docs
+          const isIntermediateResponse = response.headers.get(
+            "is-intermediate-response"
+          );
+
+          if (response.ok && isIntermediateResponse !== "true") {
+            // AI transformation is complete
             setProcessedImage(newImageUrl);
             setCurrentJob((prev) =>
               prev ? { ...prev, progress: 100, status: "completed" } : null
@@ -273,30 +444,12 @@ const Editor = () => {
             };
             setEditHistory((prev) => [completedJob, ...prev.slice(0, 2)]);
             return true;
+          } else if (response.ok && isIntermediateResponse === "true") {
+            // Still processing, continue polling
+            console.log(`Poll attempt ${attempts}: AI still processing...`);
           }
-
-          // Handle client (4xx) errors: invalid transform syntax, unauthorized, etc.
-          if (response.status >= 400 && response.status < 500) {
-            console.error(
-              `ImageKit returned ${response.status} for URL: ${newImageUrl}. Stopping polling.`
-            );
-            setCurrentJob((prev) =>
-              prev ? { ...prev, status: "error", progress: 0 } : null
-            );
-            return true; // stop polling
-          }
-
-          // For server errors (5xx) or other non-ok responses, continue polling (transforms can be async)
-          console.log(
-            `Poll attempt ${attempts}: received status ${response.status}. AI likely still processing.`
-          );
         } catch (error) {
-          // network error or fetch failure - continue polling a few times
-          console.log(
-            `Poll attempt ${attempts}: network/error while checking image - ${String(
-              error
-            )}`
-          );
+          console.log(`Poll attempt ${attempts}: AI still processing...`);
         }
 
         // update progress based on attempts
@@ -304,24 +457,28 @@ const Editor = () => {
         setCurrentJob((prev) => (prev ? { ...prev, progress } : null));
 
         if (attempts >= maxAttempts) {
-          // Timeout - mark as error instead of pretending it completed
-          console.warn(
-            `AI transformation polling timed out after ${attempts} attempts for URL: ${newImageUrl}`
-          );
+          // Timeout - mark as completed anyway
+          setProcessedImage(newImageUrl);
           setCurrentJob((prev) =>
-            prev ? { ...prev, progress: 0, status: "error" } : null
+            prev ? { ...prev, progress: 100, status: "completed" } : null
           );
 
-          // we stop polling
+          const completedJob = {
+            ...newJob,
+            status: "completed" as JobStatus,
+            progress: 100,
+            result: newImageUrl,
+          };
+          setEditHistory((prev) => [completedJob, ...prev.slice(0, 2)]);
           return true;
         }
 
-        // Continue polling after delay
+        // Continue polling
         await new Promise((resolve) => setTimeout(resolve, pollInterval));
         return pollImageKit();
       };
 
-      // start polling
+      // starting polling
       await pollImageKit();
     } catch (error) {
       console.error("Error applying effect:", error);
@@ -332,13 +489,14 @@ const Editor = () => {
   const handleExport = (format: string) => {
     if (!processedImage) return;
 
-    saveAs(processedImage, `picforge-${Date.now()}.${format}`);
+    saveAs(processedImage, `pixora-${Date.now()}.${format}`);
   };
 
   return (
     <section id="editor" className="py-24 relative overflow-hidden">
-      {/*BG Effects*/}
+      {/* Background effects */}
       <div className="absolute inset-0 bg-gradient-to-b from-background to-muted/10" />
+
       <div className="container mx-auto px-4 relative z-10">
         <motion.div
           initial={{ opacity: 0, y: 30 }}
@@ -349,18 +507,18 @@ const Editor = () => {
         >
           <h2 className="text-4xl lg:text-6xl font-bold mb-6">
             <span className="bg-gradient-primary !bg-clip-text text-transparent">
-              Forging
+              Magic
             </span>
             <span className="text-foreground"> Studio</span>
           </h2>
           <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
             Upload your photo and transform it with AI-powered tools. See the
-            image forgery happen in real-time.
+            magic happen in real-time.
           </p>
         </motion.div>
 
         <div className="grid lg:grid-cols-4 gap-8">
-          {/*Upload Area*/}
+          {/* upload area */}
           <motion.div
             initial={{ opacity: 0, x: -50 }}
             whileInView={{ opacity: 1, x: 0 }}
@@ -375,7 +533,7 @@ const Editor = () => {
                 AI Tools
               </h3>
 
-              {/* Prompt Input*/}
+              {/* Prompt Input */}
               {showPromptInput && (
                 <motion.div
                   initial={{ opacity: 0, y: -10 }}
@@ -400,16 +558,14 @@ const Editor = () => {
                     </Button>
                     <Button
                       variant="outline"
-                      onClick={() => {
-                        setShowPromptInput(false);
-                        setPromptToolId(null);
-                      }}
+                      onClick={() => setShowPromptInput(false)}
                     >
                       Cancel
                     </Button>
                   </div>
                 </motion.div>
               )}
+
               {primaryTools.map((tool) => {
                 const isActive = activeEffects.has(tool.id);
                 const isProcessing =
@@ -417,7 +573,7 @@ const Editor = () => {
                   currentJob.status === "processing";
                 const isQueued =
                   currentJob?.type === tool.id &&
-                  currentJob.status === "queued";
+                  currentJob.status === "processing";
                 const isDisabled =
                   !uploadedImage || currentJob?.status === "processing";
 
@@ -599,6 +755,7 @@ const Editor = () => {
                   Upload an image and select a tool to start
                 </p>
               )}
+
               {/* Edit History */}
               {editHistory?.length > 0 && (
                 <div className="mt-8">

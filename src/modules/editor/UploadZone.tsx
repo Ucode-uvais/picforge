@@ -11,7 +11,7 @@ import {
 import PaymentModal from "@/components/PaymentModal";
 
 interface UploadZoneProps {
-  onImageUpload: (imageUrl: string) => void;
+  onImageUpload: (imageUrl: string) => Promise<void>;
 }
 
 const UploadZone = ({ onImageUpload }: UploadZoneProps) => {
@@ -111,7 +111,7 @@ const UploadZone = ({ onImageUpload }: UploadZoneProps) => {
         // Upload to ImageKit
         const imageUrl = await uploadToImageKit(imageFile);
         setUploadedImage(imageUrl);
-        onImageUpload(imageUrl);
+        await onImageUpload(imageUrl);
       } catch (error) {
         console.error("Upload failed:", error);
       } finally {
