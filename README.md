@@ -28,12 +28,12 @@ Beyond editing, it includes **complete SaaS functionality**, including authentic
 
 ## 💡 Key Highlights
 
----- ✅ Fully functional SaaS — no backend setup required beyond environment config
----- ✅ Real-time AI-powered transformations using ImageKit
----- ✅ Stripe billing with usage metering
----- ✅ Clean UI built with Tailwind + shadcn/ui
----- ✅ Smooth animations powered by Framer Motion
----- ✅ Modular and easily extensible architecture
+- ✅ Fully functional SaaS — no backend setup required beyond environment config
+- ✅ Real-time AI-powered transformations using ImageKit
+- ✅ Stripe billing with usage metering
+- ✅ Clean UI built with Tailwind + shadcn/ui
+- ✅ Smooth animations powered by Framer Motion
+- ✅ Modular and easily extensible architecture
 
 ---
 
@@ -72,18 +72,18 @@ Beyond editing, it includes **complete SaaS functionality**, including authentic
 
 ## 🛠️ Tech Stack
 
-| Category                  | Technology                        |
-| ------------------------- | --------------------------------- |
-| Framework                 | **Next.js 14 (App Router)**       |
-| Database                  | **MongoDB**                       |
-| ORM                       | **Prisma**                        |
-| Authentication            | **NextAuth.js (Google Provider)** |
-| Payments                  | **Stripe**                        |
-| Image CDN / AI Processing | **ImageKit**                      |
-| Styling                   | **Tailwind CSS**                  |
-| UI Library                | **shadcn/ui**                     |
-| Animation                 | **Framer Motion**                 |
-| Icons                     | **Lucide React**                  |
+| Category                  | Technology                                                     |
+| ------------------------- | -------------------------------------------------------------- |
+| Framework                 | [**Next.js 14 (App Router)**](https://nextjs.org/)             |
+| Database                  | [**MongoDB**](https://www.mongodb.com/)                        |
+| ORM                       | [**Prisma**](https://www.prisma.io/)                           |
+| Authentication            | [**NextAuth.js (Google Provider)**](https://next-auth.js.org/) |
+| Payments                  | [**Stripe**](https://stripe.com/)                              |
+| Image CDN / AI Processing | [**ImageKit.io**](https://imagekit.io/)                        |
+| Styling                   | [**Tailwind CSS**](https://tailwindcss.com/)                   |
+| UI Library                | [**shadcn/ui**](https://ui.shadcn.com/)                        |
+| Animation                 | [**Framer Motion**](https://www.framer.com/motion/)            |
+| Icons                     | [**Lucide React**](https://lucide.dev/)                        |
 
 ---
 
@@ -174,3 +174,15 @@ STRIPE_WEBHOOK_SECRET="whsec_..."
 
 This project is licensed under the MIT License.
 Feel free to fork, modify, and use it in your own projects — attribution is appreciated!
+
+## 💬 Acknowledgements
+
+- Next.js
+- Stripe
+- ImageKit.io
+- NextAuth.js
+- Prisma
+- Tailwind CSS
+- shadcn/ui
+- Framer Motion
+- Lucide React
