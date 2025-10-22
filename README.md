@@ -26,6 +26,17 @@ Beyond editing, it includes **complete SaaS functionality**, including authentic
 
 ---
 
+## 💡 Key Highlights
+
+✅ Fully functional SaaS — no backend setup required beyond environment config
+✅ Real-time AI-powered transformations using ImageKit
+✅ Stripe billing with usage metering
+✅ Clean UI built with Tailwind + shadcn/ui
+✅ Smooth animations powered by Framer Motion
+✅ Modular and easily extensible architecture
+
+---
+
 ## 💼 SaaS Functionality
 
 ### 🔐 Authentication
@@ -158,3 +169,56 @@ Copy the generated whsec\_... secret and add it to .env under:
 ```bash
 STRIPE_WEBHOOK_SECRET="whsec_..."
 ```
+
+## 🗂️ Project Structure
+
+.
+├── prisma/
+│ └── schema.prisma # Prisma schema (Users, Subscriptions)
+│
+├── src/
+│ ├── app/
+│ │ ├── api/
+│ │ │ ├── auth/ # NextAuth route
+│ │ │ ├── create-checkout-session/ # Stripe checkout logic
+│ │ │ ├── upload-auth/ # ImageKit upload authentication
+│ │ │ ├── usage/ # Usage tracking APIs
+│ │ │ └── webhooks/stripe/ # Stripe webhook listener
+│ │ ├── layout.tsx # App layout
+│ │ └── page.tsx # Landing page
+│ │
+│ ├── components/
+│ │ ├── Navbar.tsx # Header navigation
+│ │ ├── Footer.tsx # Footer section
+│ │ └── PaymentModal.tsx # Upgrade modal
+│ │
+│ ├── lib/
+│ │ ├── auth.ts # NextAuth configuration
+│ │ ├── prisma.ts # Prisma client
+│ │ └── utils.ts # Utility helpers
+│ │
+│ └── modules/
+│ ├── editor/
+│ │ ├── Editor.tsx # Main editor logic
+│ │ ├── CanvasEditor.tsx # Handles image rendering
+│ │ └── UploadZone.tsx # Upload + usage check
+│ │
+│ ├── hero/
+│ │ ├── Hero.tsx # Landing hero section
+│ │ └── BeforeAfterSlider.tsx # Before/After comparison slider
+│ │
+│ ├── features/
+│ │ └── Features.tsx # Features section
+│ │
+│ └── pricing/
+│ └── Pricing.tsx # Pricing table
+│
+└── public/
+├── apple-touch-icon.png
+├── favicon.ico
+└── og-image.png
+
+## 🧾 License
+
+This project is licensed under the MIT License.
+Feel free to fork, modify, and use it in your own projects — attribution is appreciated!
