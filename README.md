@@ -90,3 +90,71 @@ cd picforge
 ```bash
 npm install
 ```
+
+## 3️⃣ Set Up the Database
+
+- Create a MongoDB Atlas cluster.
+- Obtain your connection URI.
+
+## 4️⃣ Configure Environment Variables
+
+Create a .env file in your project root:
+
+```bash
+# Prisma / MongoDB
+DATABASE_URL="your_mongodb_connection_string"
+
+# NextAuth
+NEXTAUTH_SECRET="a_random_secret_string_for_nextauth"
+NEXTAUTH_URL="http://localhost:3000"
+GOOGLE_CLIENT_ID="your_google_oauth_client_id"
+GOOGLE_CLIENT_SECRET="your_google_oauth_client_secret"
+
+# Stripe
+STRIPE_SECRET_KEY="sk_test_..."
+STRIPE_WEBHOOK_SECRET="whsec_..."
+STRIPE_PRICE_ID="price_..."
+
+# ImageKit
+IMAGEKIT_PUBLIC_KEY="public_..."
+IMAGEKIT_PRIVATE_KEY="private_..."
+
+```
+
+Where to find them:
+
+- _DATABASE_URL_: MongoDB Atlas
+
+- _GOOGLE\_..._: Google Cloud Console
+
+- _STRIPE\_..._: Stripe Dashboard
+
+- _IMAGEKIT\_..._: ImageKit Dashboard -> Developer Options
+
+## 5️⃣ Push Database Schema
+
+```bash
+npx prisma db push
+```
+
+## 6️⃣ Run the Development Server
+
+```bash
+npm run dev
+```
+
+**Open http://localhost:3000 to view the app.**
+
+## 7️⃣ Configure Stripe Webhook
+
+For subscription events to work, set up Stripe’s webhook listener by entering the below command in your terminal:
+
+```bash
+stripe listen --forward-to http://localhost:3000/api/webhooks/stripe
+```
+
+Copy the generated whsec\_... secret and add it to .env under:
+
+```bash
+STRIPE_WEBHOOK_SECRET="whsec_..."
+```
