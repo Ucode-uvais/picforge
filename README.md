@@ -4,6 +4,9 @@
 
 ---
 
+<img width="1919" height="816" alt="image" src="https://github.com/user-attachments/assets/f04812c2-7c6b-4331-a187-ed38c73868b5" />
+
+
 ## ✨ Overview
 
 **PicForge AI** is a full-featured **AI Photo Editor Micro SaaS** that combines a sleek UI with powerful backend automation.  
