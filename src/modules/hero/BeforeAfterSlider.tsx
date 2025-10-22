@@ -24,8 +24,8 @@ const BeforeAfterSlider = () => {
   };
 
   // Real before/after images
-  const beforeImage = "https://ik.imagekit.io/fftupmwca/tree.webp";
-  const afterImage = "https://ik.imagekit.io/fftupmwca/tree-transformed.webp";
+  const beforeImage = "https://ik.imagekit.io/dpvnothoj/tree.webp";
+  const afterImage = "https://ik.imagekit.io/dpvnothoj/tree-transformed.webp";
 
   return (
     <motion.div
