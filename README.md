@@ -28,12 +28,12 @@ Beyond editing, it includes **complete SaaS functionality**, including authentic
 
 ## 💡 Key Highlights
 
-✅ Fully functional SaaS — no backend setup required beyond environment config
-✅ Real-time AI-powered transformations using ImageKit
-✅ Stripe billing with usage metering
-✅ Clean UI built with Tailwind + shadcn/ui
-✅ Smooth animations powered by Framer Motion
-✅ Modular and easily extensible architecture
+---- ✅ Fully functional SaaS — no backend setup required beyond environment config
+---- ✅ Real-time AI-powered transformations using ImageKit
+---- ✅ Stripe billing with usage metering
+---- ✅ Clean UI built with Tailwind + shadcn/ui
+---- ✅ Smooth animations powered by Framer Motion
+---- ✅ Modular and easily extensible architecture
 
 ---
 
