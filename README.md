@@ -84,3 +84,9 @@ Beyond editing, it includes **complete SaaS functionality**, including authentic
 git clone https://github.com/Ucode-uvais/picforge.git
 cd picforge
 ```
+
+### 2️⃣ Install Dependencies
+
+```bash
+npm install
+```
