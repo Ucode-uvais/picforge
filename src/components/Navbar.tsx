@@ -1,5 +1,5 @@
 "use client";
-import { signIn, useSession } from "next-auth/react";
+import { signIn, useSession, signOut } from "next-auth/react"; // 1. Import signOut
 import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Menu, SwitchCamera, X } from "lucide-react";
@@ -34,6 +34,12 @@ const Navbar = () => {
     }
   };
 
+  // 2. Add a sign-out handler
+  const handleSignOut = async () => {
+    setIsMobileMenuOpen(false);
+    await signOut({ callbackUrl: "/" });
+  };
+
   return (
     <motion.nav
       initial={{ y: -100 }}
@@ -66,7 +72,9 @@ const Navbar = () => {
           </motion.div>
 
           {/*Navigation*/}
-          <div className="hidden md:flex items-center space-x-8">
+          <div className="hidden md:flex items-center space-x-6">
+            {" "}
+            {/* Reduced space slightly to fit */}
             <button
               onClick={() => scrollToSection("features")}
               className="text-foreground hover:text-primary transition-colors font-medium"
@@ -81,11 +89,21 @@ const Navbar = () => {
             </button>
             <Button
               variant="hero"
-              className="w-full font-semibold"
+              className="font-semibold" // Removed w-full
               onClick={handleSubmit}
             >
               {session?.user ? "Let's Forge" : "Sign In"}
             </Button>
+            {/* 3. Add Sign Out button for desktop */}
+            {session?.user && (
+              <Button
+                variant="outline"
+                className="font-semibold"
+                onClick={handleSignOut}
+              >
+                Sign Out
+              </Button>
+            )}
           </div>
 
           {/* Mobile Menu */}
@@ -129,6 +147,16 @@ const Navbar = () => {
             >
               {session?.user ? "Let's Forge" : "Sign In"}
             </Button>
+            {/* 4. Add Sign Out button for mobile */}
+            {session?.user && (
+              <Button
+                variant="outline"
+                className="w-full font-semibold"
+                onClick={handleSignOut}
+              >
+                Sign Out
+              </Button>
+            )}
           </div>
         </motion.div>
       </div>
