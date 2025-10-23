@@ -247,6 +247,7 @@ const UploadZone = ({ onImageUpload }: UploadZoneProps) => {
               variant="outline"
               className="glass border-card-border"
               disabled={isUploading}
+              onClick={() => document.getElementById("file-upload")?.click()}
             >
               {isUploading ? (
                 <>
