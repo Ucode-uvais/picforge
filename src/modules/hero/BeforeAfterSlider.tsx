@@ -6,26 +6,39 @@ const BeforeAfterSlider = () => {
   const [isDragging, setIsDragging] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
 
-  const handleMouseDown = () => {
+  const handleDragStart = () => {
     setIsDragging(true);
   };
 
-  const handleMouseUp = () => {
+  const handleDragEnd = () => {
     setIsDragging(false);
   };
 
-  const handleMouseMove = (e: React.MouseEvent) => {
+  // Unified drag handler for both mouse and touch
+  const handleDragMove = (clientX: number) => {
     if (!isDragging || !containerRef.current) return;
 
     const rect = containerRef.current.getBoundingClientRect();
-    const x = e.clientX - rect.left;
+    const x = clientX - rect.left;
     const percentage = Math.max(0, Math.min(100, (x / rect.width) * 100));
     setSliderPosition(percentage);
   };
 
+  // Mouse event handlers
+  const handleMouseMove = (e: React.MouseEvent) => {
+    handleDragMove(e.clientX);
+  };
+
+  // Touch event handlers
+  const handleTouchMove = (e: React.TouchEvent) => {
+    if (e.touches[0]) {
+      handleDragMove(e.touches[0].clientX);
+    }
+  };
+
   // Real before/after images
-  const beforeImage = "https://ik.imagekit.io/dpvnothoj/tree.webp";
-  const afterImage = "https://ik.imagekit.io/dpvnothoj/tree-transformed.webp";
+  const beforeImage = "https://ik.imagekit.io/fftupmwca/tree.webp";
+  const afterImage = "https://ik.imagekit.io/fftupmwca/tree-transformed.webp";
 
   return (
     <motion.div
@@ -37,9 +50,13 @@ const BeforeAfterSlider = () => {
       <div
         ref={containerRef}
         className="relative w-full aspect-[4/3] rounded-2xl overflow-hidden shadow-glass border border-card-border glow-subtle cursor-ew-resize select-none"
+        // Mouse events
         onMouseMove={handleMouseMove}
-        onMouseUp={handleMouseUp}
-        onMouseLeave={handleMouseUp}
+        onMouseUp={handleDragEnd}
+        onMouseLeave={handleDragEnd}
+        // Touch events
+        onTouchMove={handleTouchMove}
+        onTouchEnd={handleDragEnd}
       >
         {/* Before Image */}
         <div className="absolute inset-0">
@@ -66,7 +83,10 @@ const BeforeAfterSlider = () => {
         <div
           className="absolute top-0 bottom-0 w-1 bg-gradient-primary cursor-ew-resize group"
           style={{ left: `${sliderPosition}%`, transform: "translateX(-50%)" }}
-          onMouseDown={handleMouseDown}
+          // Mouse event
+          onMouseDown={handleDragStart}
+          // Touch event
+          onTouchStart={handleDragStart}
         >
           <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-8 h-8 bg-gradient-primary rounded-full shadow-glow-primary group-hover:scale-110 transition-transform flex items-center justify-center">
             <div className="w-6 h-6 bg-background rounded-full flex items-center justify-center">

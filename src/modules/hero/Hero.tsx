@@ -54,9 +54,7 @@ const Hero = () => {
               PicForge AI
             </span>
             <br />
-            <span className="text-foreground">
-              Your AI-Powered Image Editor
-            </span>
+            <span className="text-foreground">An AI-Powered Image Editor</span>
           </motion.h1>
 
           <motion.p

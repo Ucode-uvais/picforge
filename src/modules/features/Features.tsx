@@ -61,7 +61,7 @@ const Features = () => {
         >
           <div className="flex items-center justify-center">
             <SparklesText
-              text="Magical AI"
+              text="Picforge"
               colors={{ first: "#ffc800", second: "#ff8c00" }}
               className="text-4xl lg:text-6xl"
             />
