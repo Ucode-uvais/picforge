@@ -90,29 +90,6 @@ const CanvasEditor = ({
                 className="w-full h-full object-contain"
               />
             </div>
-
-            {/* Slider */}
-            <div
-              className="absolute top-0 bottom-0 w-1 bg-gradient-primary"
-              style={{
-                left: `${sliderPosition}%`,
-                transform: "translateX(-50%)",
-              }}
-            >
-              <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-8 h-8 bg-gradient-primary rounded-full shadow-glow-primary flex items-center justify-center">
-                <div className="w-6 h-6 bg-background rounded-full flex items-center justify-center">
-                  <div className="w-1 h-4 bg-gradient-primary rounded-full" />
-                </div>
-              </div>
-            </div>
-
-            {/* Labels */}
-            <div className="absolute bottom-4 left-4 text-xs font-medium text-background bg-foreground/80 px-2 py-1 rounded">
-              BEFORE
-            </div>
-            <div className="absolute bottom-4 right-4 text-xs font-medium text-background bg-primary px-2 py-1 rounded">
-              AFTER
-            </div>
           </div>
         ) : (
           <div className="w-full h-full">
@@ -136,7 +113,7 @@ const CanvasEditor = ({
               {showComparison ? (
                 <>
                   <EyeOff className="h-4 w-4 mr-2" />
-                  Hide Compare
+                  Hide
                 </>
               ) : (
                 <>
